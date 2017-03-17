@@ -30,6 +30,7 @@ defmodule Exling.Mixfile do
   defp deps do
     [{:httpoison, "~> 0.11.1"},
      {:poison, "~> 3.1"},
-   {:bypass, "~> 0.6.0", only: :test},]
+     {:mime, "~> 1.1"},
+     {:bypass, "~> 0.6.0", only: :test},]
   end
 end

@@ -1,3 +1,3 @@
 defmodule Exling.Request do
-  defstruct uri: nil, method: :get, body: nil, headers: []
+  defstruct uri: nil, method: :get, body: "", headers: []
 end
