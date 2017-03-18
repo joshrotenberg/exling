@@ -1,12 +1,22 @@
 defmodule Exling do
   @moduledoc """
-  Documentation for Exling.
+  Exling is a fluent HTTP request builder and executor for Elixir. It is
+  intended to make it simpler to build HTTP client APIs, but should be handy
+  any time you need to make an HTTP request. It isn't an HTTTP client library,
+  however, and leaves the actual request and response handling up to already
+  established libraries.
   """
 
   @doc """
   Returns a new Exling.Request.
   """
-  def new(), do: %Exling.Request{}
+  def new(), do: %{%Exling.Request{} | uri: URI.parse("")}
+  def new(base_uri), do: %Exling.Request{} |> base(base_uri)
+
+  @doc """
+  Set the client type to handle actual requests. Defaults to :httpoison
+  """
+  def client(request, client) do: %{request | client: client)
 
   @doc """
   Set the base URI (or really as much URI information as you want).
@@ -19,10 +29,11 @@ defmodule Exling do
     r = Exling.new |>
     Exling.base("http://something.else.com/with/more/path")
   """
-  def base(request, base), do: %{request | uri: URI.parse(base)}
+  def base(request, base_uri), do: %{request | uri: URI.parse(base_uri)}
 
   @doc """
-  Set the URI path.
+  Set the URI path. Exling will try to figure out slashes for you so a leading
+  slash is optional.
 
   ## Examples
   
@@ -31,7 +42,11 @@ defmodule Exling do
     Exling.path("/some/path")
   """
   def path(request, path) do
-    %{request | uri: URI.parse(Path.join([URI.to_string(request.uri), path]))}
+    if is_nil(request.uri.path) do
+      %{request | uri: URI.merge(URI.parse(request.uri), path)}
+    else
+      update_in(request.uri.path, &(Path.join([&1, path])))
+    end
   end
 
   defp set_method_and_uri(request, method, path) do 
@@ -42,9 +57,9 @@ defmodule Exling do
   end
 
   @doc """
-  Set the method to GET and add to the path. The optional extra path info is handy for REST APIs
-  that may have multiple paths to an object with the final bit being an ID that might change
-  often.
+  Set the method to GET and add to the path. The optional extra path info is
+  handy for REST APIs that may have multiple paths to an object with the final
+  bit being an ID that might change often.
 
   ## Examples
 
@@ -158,13 +173,22 @@ defmodule Exling do
   
   @doc """
   Set query params with a map, keyword list, or key and value. Can be called multiple times to append new params.
+
+  # Example
+    r = Exling.new |>
+        Exling.base("http://foo.com") |>
+        Exling.query(foo: "bar") |>
+        Exling.query(:boo, "far") |>
+        Exling.query(Keyword.new([{:b, 1}, {:a, 2}])) |>
+        Exling.query(%{and: "more"})
   """
   def query(request, k, v), do: query(request, %{k => v})
   def query(request, query) when is_list(query), do: query(request, Enum.into(query, %{}))
   def query(request, query) when is_map(query) do
-    uri = cond do
-      request.uri.query -> append_query(request.uri, query, "&")
-      true -> append_query(request.uri, query, "?")
+    uri = if request.uri.query do
+      append_query(request.uri, query, "&")
+    else
+      append_query(request.uri, query, "?")
     end
     %{request | uri: uri}
   end
@@ -172,7 +196,11 @@ defmodule Exling do
   
   # request
   def receive(request, options \\ []) do
-    HTTPoison.request(request.method, URI.to_string(request.uri), request.body, request.headers, options)
+    case request.client do
+      :httpoison -> HTTPoison.request(request.method, URI.to_string(request.uri), request.body, request.headers, options)
+      :httpoison! -> HTTPoison.request!(request.method, URI.to_string(request.uri), request.body, request.headers, options)
+      _ -> raise "client not recognized"
+    end
   end
 
   def receive!(request, options \\ []) do
