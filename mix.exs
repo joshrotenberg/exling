@@ -31,6 +31,8 @@ defmodule Exling.Mixfile do
     [{:httpoison, "~> 0.11.1"},
      {:poison, "~> 3.1"},
      {:mime, "~> 1.1"},
-     {:bypass, "~> 0.6.0", only: :test},]
+     {:bypass, "~> 0.6.0", only: :test},
+     {:credo, "~> 0.5", only: [:dev, :test]}
+   ]
   end
 end
