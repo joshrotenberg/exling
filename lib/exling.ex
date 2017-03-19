@@ -16,7 +16,7 @@ defmodule Exling do
   @doc """
   Set the client type to handle actual requests. Defaults to :httpoison
   """
-  def client(request, client) do: %{request | client: client)
+  def client(request, client), do: %{request | client: client}
 
   @doc """
   Set the base URI (or really as much URI information as you want).
