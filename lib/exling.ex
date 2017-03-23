@@ -148,11 +148,12 @@ defmodule Exling do
   end
   
   @doc """
-  Set the request body. Use a type option to save yourself the trouble of setting the content type
-  for common values. In the case of `:form` or `:json`, your body data should be a map and will automatically
-  be encoded as well. `:xml` will set the content type but you are on your own for encoding, and if you
-  have other content encoding needs, just use `body(my_body)` and set the content type yourself with 
-  `content_type` or `set`. 
+  Set the request body. Use a type option to save yourself the trouble of
+  setting the content type for common values. In the case of `:form` or
+  `:json`, your body data should be a map and will automatically be encoded as
+  well. `:xml` will set the content type but you are on your own for encoding,
+  and if you have other content encoding needs, just use `body(my_body)` and
+  set the content type yourself with `content_type` or `set`. 
 
   ## Example
       r = Exling.new |>
@@ -172,7 +173,8 @@ defmodule Exling do
   end
   
   @doc """
-  Set query params with a map, keyword list, or key and value. Can be called multiple times to append new params.
+  Set query params with a map, keyword list, or key and value. Can be called
+  multiple times to append new params.
 
   # Example
     r = Exling.new |>
@@ -193,8 +195,9 @@ defmodule Exling do
     %{request | uri: uri}
   end
   
-  
-  # request
+  @doc """
+  Send the request. 
+  """
   def receive(request, options \\ []) do
     case request.client do
       :httpoison -> HTTPoison.request(request.method, URI.to_string(request.uri), request.body, request.headers, options)
@@ -203,7 +206,4 @@ defmodule Exling do
     end
   end
 
-  def receive!(request, options \\ []) do
-    HTTPoison.request!(request.method, URI.to_string(request.uri), request.body, request.headers, options)
-  end
 end
