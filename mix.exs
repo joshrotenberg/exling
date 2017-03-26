@@ -8,6 +8,7 @@ defmodule Exling.Mixfile do
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     test_coverage: [tool: ExCoveralls],
      deps: deps(),
      package: package(),
      description: description(),
@@ -37,6 +38,7 @@ defmodule Exling.Mixfile do
      {:poison, "~> 3.1"},
      {:ex_doc, "~> 0.14", only: :dev, runtime: false},
      {:bypass, "~> 0.6.0", only: :test},
+     {:excoveralls, "~> 0.6", only: :test},
      {:credo, "~> 0.5", only: [:dev, :test]}]
   end
 end
