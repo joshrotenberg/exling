@@ -76,7 +76,8 @@ defmodule ExlingTest do
   end
 
   test "headers" do
-
+    r = Exling.new("http://fake.com") |> Exling.set("Key", "Value")
+    assert r.headers != []
   end
 
   test "body" do
