@@ -4,42 +4,75 @@ defmodule Exling do
   intended to make it simpler to build HTTP client APIs, but should be handy
   any time you need to make an HTTP request. It isn't an HTTTP client library,
   however, and leaves the actual request and response handling up to already
-  established libraries.
+  established HTTP libraries.
+
+  Exling strives to be a simple, intuitive way to encapsulate API interaction with
+  clear and minimal code that can be built upon and easily extended. Using Elixir's
+  pipe operator, the developer can clearly define an API request's URI, headers, body,
+  and method. It makes reasonable
+  assumptions (such as setting the content type for you when possible) while not
+  making it difficult to override these assumptions, and extending the interface should
+  be trivial by manipulating the `Exling.Request` yourself with your own custom functions.
+
+      {:ok, response} = Exling.new |>
+            Exling.base("http://some.api.io") |>
+            Exling.post("thing") |>
+            Exling.body(%{args: "here"}, :json) |>
+            Exling.receive()
   """
 
   @doc """
-  Returns a new Exling.Request.
+  Returns a new `Exling.Request`. 
+
+      # a new, empty request
+      r = Exling.new 
   """
   def new(), do: %{%Exling.Request{} | uri: URI.parse("")}
+  
+  @doc """
+  Returns a new Exling.Request with base URI configured.
+
+      # a request with our base URI already configured
+      r = Exling.new("http://some.api.io/stuff")
+  """
   def new(base_uri), do: %Exling.Request{} |> base(base_uri)
 
   @doc """
-  Set the client type to handle actual requests. Defaults to :httpoison
+  Set the client type to handle actual requests. Defaults to `:httpoison`. Currently
+  only supports `:httpoison` and `:httpoison!`. More to come.
   """
   def client(request, client), do: %{request | client: client}
 
   @doc """
   Set the base URI (or really as much URI information as you want).
 
-  ## Examples
-    
-    r = Exling.new |> 
-    Exling.base("http://example.com")
+      r = Exling.new |> 
+        Exling.base("http://example.com")
 
-    r = Exling.new |>
-    Exling.base("http://something.else.com/with/more/path")
+      r = Exling.new |>
+        Exling.base("http://something.else.com/with/more/path")
   """
   def base(request, base_uri), do: %{request | uri: URI.parse(base_uri)}
 
   @doc """
   Set the URI path. Exling will try to figure out slashes for you so a leading
-  slash is optional.
+  slash is optional. Can be called multiple times to append path elements.
 
-  ## Examples
-  
-    r = Exling.new |>
-    Exling.base("http://example.com") |>
-    Exling.path("/some/path")
+      # this request points at http://exampl.com/some/path
+      r = Exling.new |>
+        Exling.base("http://example.com") |>
+        Exling.path("/some/path")
+
+      # and so does this one
+      r = Exling.new("http://example.com") |>
+        Exling.path("some") |>
+        Exling.path("path")
+
+      # and so does this one (see docs for setting the method)
+      r = Exling.new("http://example.com") |>
+        Exling.path("some")
+        Exling.get("path")
+      
   """
   def path(request, path) do
     if is_nil(request.uri.path) do
@@ -57,16 +90,14 @@ defmodule Exling do
   end
 
   @doc """
-  Set the method to GET and add to the path. The optional extra path info is
+  Set the method to GET and (optionally) add to the path. The optional extra path info is
   handy for REST APIs that may have multiple paths to an object with the final
   bit being an ID that might change often.
 
-  ## Examples
-
-    r = Exline.new |>
-    Exling.base("http://example.com") |>
-    Exling.path("/things") |>
-    Exling.get("1")
+      r = Exline.new |>
+        Exling.base("http://example.com") |>
+        Exling.path("/things") |>
+        Exling.get("1")
   """
   def get(request, path \\ nil), do: set_method_and_uri(request, :get, path)
 
@@ -117,9 +148,14 @@ defmodule Exling do
   # type header convenience
 
   @doc """
-  Set the HTTP Content-type header. Use :json, :form, :xml or :plain, or your custom string if
-  none of those apply. Note that using `body()` with the :json, :form, or :xml options will set this for you,
-  but if you need to override it for some reason call this later in the chain.
+  Set the HTTP Content-type header. Use `:json`, `:form`, `:xml` or `:plain`, or your 
+  custom string if none of those apply. Note that using `body()` with the `:json`, 
+  `:form`, or `:xml` options will set this for you, but if you need to override it 
+  for some reason call this later in the chain.
+
+      r = Exling.new("http://some.api.io")
+        Exling.content_type(:plain)
+        Exling.body("some string")
   """
   def content_type(request, type) when is_binary(type), do: set(request, "Content-type", type)
   def content_type(request, type) when is_atom(type) do
@@ -155,11 +191,10 @@ defmodule Exling do
   and if you have other content encoding needs, just use `body(my_body)` and
   set the content type yourself with `content_type` or `set`. 
 
-  ## Example
       r = Exling.new |>
-      Exling.base("http://foo.com") |>
-      Exling.post() |>
-      Exling.body(%{my: "stuff"}, :json)
+        Exling.base("http://foo.com") |>
+        Exling.post() |>
+        Exling.body(%{my: "stuff"}, :json)
   """
   def body(request, body, :form), do: %{request | body: {:form, body}} |> content_type(:form)
   def body(request, body, :json), do: %{request | body: Poison.encode!(body)} |> content_type(:json)
@@ -176,8 +211,7 @@ defmodule Exling do
   Set query params with a map, keyword list, or key and value. Can be called
   multiple times to append new params.
 
-  # Example
-    r = Exling.new |>
+      r = Exling.new |>
         Exling.base("http://foo.com") |>
         Exling.query(foo: "bar") |>
         Exling.query(:boo, "far") |>
@@ -196,7 +230,12 @@ defmodule Exling do
   end
   
   @doc """
-  Send the request. 
+  Send the request. The return value is whatever your chosen client implementation returns.
+  Currently only `:httpoison` and `:httpoison!` are supported, planning to extend how this works 
+  in the future.
+
+      {:ok, response} = Exling.new("http://some.api.io") |>
+            Exling.get("something")  
   """
   def receive(request, options \\ []) do
     case request.client do

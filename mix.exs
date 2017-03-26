@@ -3,7 +3,7 @@ defmodule Exling.Mixfile do
 
   def project do
     [app: :exling,
-     version: "0.1.0",
+r    version: "0.1.1",
      name: "Exling",
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
@@ -35,7 +35,7 @@ defmodule Exling.Mixfile do
   defp deps do
     [{:httpoison, "~> 0.11.1"},
      {:poison, "~> 3.1"},
-     {:ex_doc, ">= 0.0.0", only: :dev},
+     {:ex_doc, "~> 0.14", only: :dev, runtime: false},
      {:bypass, "~> 0.6.0", only: :test},
      {:credo, "~> 0.5", only: [:dev, :test]}]
   end
