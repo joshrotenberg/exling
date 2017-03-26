@@ -27,7 +27,7 @@ end
 		  Exline.receive()
 
 # send some post data and get JSON back
-# {:ok, response} = Exling.new |>
+{:ok, response} = Exling.new |>
 		    Exling.base("http://httpbin.org") |>
 		    Exling.accept(:json)
 		    Exling.post("post") |>
