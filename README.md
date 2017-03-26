@@ -1,8 +1,9 @@
 # Exling
 
+[![Build Status](https://travis-ci.org/joshrotenberg/exling.svg?branch=master)](https://travis-ci.org/joshrotenberg/exling) [![Hex pm](http://img.shields.io/hexpm/v/exling.svg?style=flat)](https://hex.pm/packages/exling) [![hex.pm downloads](https://img.shields.io/hexpm/dt/exling.svg?style=flat)](https://hex.pm/packages/exling)[![Coverage Status](https://coveralls.io/repos/github/joshrotenberg/exling/badge.svg?branch=master)](https://coveralls.io/github/joshrotenberg/exling?branch=master)
+
 > you don’t have to be a Jedi to fly an Exling
 
-[![Build Status](https://travis-ci.org/joshrotenberg/exling.svg?branch=master)](https://travis-ci.org/joshrotenberg/exling) [![Hex pm](http://img.shields.io/hexpm/v/exling.svg?style=flat)](https://hex.pm/packages/exling) [![hex.pm downloads](https://img.shields.io/hexpm/dt/exling.svg?style=flat)](https://hex.pm/packages/exling)[![Coverage Status](https://coveralls.io/repos/github/joshrotenberg/exling/badge.svg?branch=master)](https://coveralls.io/github/joshrotenberg/exling?branch=master)
 
 Exling is a fluent HTTP request builder for Elixir, inspired by the
 [sling](https://github.com/dghubble/sling) library in Go. Exling uses Elixir

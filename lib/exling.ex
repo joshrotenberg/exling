@@ -41,7 +41,19 @@ defmodule Exling do
   Set the client type to handle actual requests. Defaults to `:httpoison`. Currently
   only supports `:httpoison` and `:httpoison!`. More to come.
   """
-  def client(request, client), do: %{request | client: client}
+  def client(request, f) when is_function(f, 1) do
+    %{request | client: f}
+  end
+
+  @doc """
+  """
+  def client(request, client) do 
+    case client do
+      :httpoison -> Code.ensure_compiled?(HTTPoison)
+      :hackney -> Code.ensure_compiled?(:hackney)
+    end
+    %{request | client: client}
+  end
 
   @doc """
   Set the base URI (or really as much URI information as you want).
@@ -83,9 +95,10 @@ defmodule Exling do
   end
 
   defp set_method_and_uri(request, method, path) do 
-    case is_nil(path) do
-      true -> %{request | method: method}
-      _ -> %{request | method: method} |> path(path)
+    if is_nil(path) do
+       %{request | method: method}
+    else
+       %{request | method: method} |> path(path)
     end
   end
 
