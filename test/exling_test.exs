@@ -78,15 +78,20 @@ defmodule ExlingTest do
   test "headers" do
     r = Exling.new("http://fake.com") |> Exling.set("Key", "Value")
     assert r.headers != []
+    IO.inspect r
   end
 
   test "body" do
-
+    r = Exling.new() |> Exling.base("http://fake.com") |> Exling.body("stuff")
+    assert r.body != nil
+    IO.inspect r
   end
 
   test "query" do
 
   end
 
+  test "client" do
+  end
 
 end
