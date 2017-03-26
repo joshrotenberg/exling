@@ -1,5 +1,11 @@
 # Exling
 
+[![Build Status](https://travis-ci.org/joshrotenberg/exling.svg?branch=master)](https://travis-ci.org/joshrotenberg/exling)
+
+[![Hex pm](http://img.shields.io/hexpm/v/exling.svg?style=flat)](https://hex.pm/packages/exling) 
+
+[![hex.pm downloads](https://img.shields.io/hexpm/dt/exling.svg?style=flat)](https://hex.pm/packages/exling)
+
 Exling is a fluent HTTP request builder for Elixir, inspired by the
 [sling](https://github.com/dghubble/sling) library in Go. Exling uses Elixir
 pipes to make building and executing HTTP requests clear and concise, and is
@@ -13,7 +19,7 @@ by adding `exling` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:exling, "~> 0.1.0"}]
+  [{:exling, "~> 0.1.1"}]
 end
 ```
 
