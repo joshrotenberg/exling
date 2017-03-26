@@ -3,7 +3,7 @@ defmodule Exling.Mixfile do
 
   def project do
     [app: :exling,
-r    version: "0.1.1",
+     version: "0.1.1",
      name: "Exling",
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
