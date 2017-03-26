@@ -1,5 +1,7 @@
 # Exling
 
+> you don’t have to be a Jedi to fly an Exling
+
 [![Build Status](https://travis-ci.org/joshrotenberg/exling.svg?branch=master)](https://travis-ci.org/joshrotenberg/exling) [![Hex pm](http://img.shields.io/hexpm/v/exling.svg?style=flat)](https://hex.pm/packages/exling) [![hex.pm downloads](https://img.shields.io/hexpm/dt/exling.svg?style=flat)](https://hex.pm/packages/exling)[![Coverage Status](https://coveralls.io/repos/github/joshrotenberg/exling/badge.svg?branch=master)](https://coveralls.io/github/joshrotenberg/exling?branch=master)
 
 Exling is a fluent HTTP request builder for Elixir, inspired by the
@@ -10,8 +12,7 @@ useful any time HTTP requests need to be made.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `exling` to your list of dependencies in `mix.exs`:
+Add `exling` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -35,7 +36,6 @@ end
 		    Exling.post("post") |>
 		    Exling.body(%{foo: "bar"}, :json) |>
 		    Exling.receive()
-
 ```
 ## TODO
 
