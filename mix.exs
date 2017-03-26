@@ -5,7 +5,7 @@ defmodule Exling.Mixfile do
     [app: :exling,
      version: "0.1.1",
      name: "Exling",
-     elixir: "~> 1.4",
+     elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps(),
