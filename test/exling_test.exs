@@ -5,7 +5,7 @@ defmodule ExlingTest do
   test "new" do
     r = Exling.new()
     assert r.body == ""
-    assert r.client == :httpoison
+    assert r.client == HTTPoison
     assert r.headers == []
     assert r.method == :get
     assert r.uri == %URI{authority: nil, fragment: nil, host: nil, path: nil, port: nil,
@@ -13,7 +13,7 @@ defmodule ExlingTest do
 
     r = Exling.new("http://fake.com")
     assert r.body == ""
-    assert r.client == :httpoison
+    assert r.client == HTTPoison
     assert r.headers == []
     assert r.method == :get
     assert r.uri == %URI{authority: "fake.com", fragment: nil, host: "fake.com", path: nil, 
@@ -23,7 +23,7 @@ defmodule ExlingTest do
   test "base" do
     r = Exling.new |> Exling.base("http://fake.com")
     assert r.body == ""
-    assert r.client == :httpoison
+    assert r.client == HTTPoison
     assert r.headers == []
     assert r.method == :get
     assert r.uri == %URI{authority: "fake.com", fragment: nil, host: "fake.com", path: nil, 
@@ -31,7 +31,7 @@ defmodule ExlingTest do
     
     r = Exling.new |> Exling.base("http://fake.com/path?doof=cha")
     assert r.body == ""
-    assert r.client == :httpoison
+    assert r.client == HTTPoison
     assert r.headers == []
     assert r.method == :get
     assert r.uri == %URI{authority: "fake.com", fragment: nil, host: "fake.com", path: "/path", 
@@ -76,6 +76,15 @@ defmodule ExlingTest do
   end
 
   test "headers" do
+    r = Exling.new("http://fake.com") |> Exling.set("Key", "Value")
+    assert r.headers == [{"Key", "Value"}]
+    r = Exling.set(r, "Key", "OtherValue")
+    assert r.headers == [{"Key", "OtherValue"}]
+
+    r = Exling.new("http://fake.com") |> Exling.add("Key", "Value") |>
+      Exling.add("Key", "OtherValue")
+    assert r.headers == [{"Key", "OtherValue"}, {"Key", "Value"}]
+    IO.inspect r
 
   end
 

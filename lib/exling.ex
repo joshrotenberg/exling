@@ -21,6 +21,8 @@ defmodule Exling do
             Exling.receive()
   """
 
+  @supported_client_modules [HTTPoison, HTTPotion, :hackney, :ibrowse]
+
   @doc """
   Returns a new `Exling.Request`. 
 
@@ -38,21 +40,21 @@ defmodule Exling do
   def new(base_uri), do: %Exling.Request{} |> base(base_uri)
 
   @doc """
-  Set the client type to handle actual requests. Defaults to `:httpoison`. Currently
-  only supports `:httpoison` and `:httpoison!`. More to come.
+  Set the client module for a predefined request handling backend. Supported options are 
+  `HTTPoison` (default), `HTTPotion`, `:hackney`, or `:ibrowse`. Or, set the client to a one or two
+  arity function for custom impementations. A single arity function will just get the request, a double
+  will also get the options passed to `receive`. The function will be called with the `Exling.Request` 
+  struct along with any options (see `receive`).
   """
-  def client(request, f) when is_function(f, 1) do
-    %{request | client: f}
-  end
-
-  @doc """
-  """
-  def client(request, client) do 
-    case client do
-      :httpoison -> Code.ensure_compiled?(HTTPoison)
-      :hackney -> Code.ensure_compiled?(:hackney)
+  def client(request, f) when is_function(f, 1) or is_function(f, 2), do: %{request | client: f}
+  def client(request, client_module) do 
+    if !Enum.member?(@supported_client_modules, client_module) do
+      raise "'#{client_module}' isn't a recognized client implementation"
     end
-    %{request | client: client}
+    case Code.ensure_loaded(client_module) do
+      {:module, module_name} -> %{request | client: module_name}
+      {:error, :nofile} -> raise "'#{client_module} isn't available, did you add it to `deps`?"
+    end
   end
 
   @doc """
@@ -244,16 +246,19 @@ defmodule Exling do
   
   @doc """
   Send the request. The return value is whatever your chosen client implementation returns.
-  Currently only `:httpoison` and `:httpoison!` are supported, planning to extend how this works 
-  in the future.
+  See `client` for supported implementations.
 
       {:ok, response} = Exling.new("http://some.api.io") |>
-            Exling.get("something")  
+            Exling.client(HTTPoison)
+            Exling.get("something") |>
+            Exling.receive()
   """
   def receive(request, options \\ []) do
     case request.client do
-      :httpoison -> HTTPoison.request(request.method, URI.to_string(request.uri), request.body, request.headers, options)
-      :httpoison! -> HTTPoison.request!(request.method, URI.to_string(request.uri), request.body, request.headers, options)
+      HTTPoison -> HTTPoison.request(request.method, URI.to_string(request.uri), request.body, request.headers, options)
+      :hackney -> :hackney.request(request.method, URI.to_string(request.uri), request.headers, request.body, options)
+      f when is_function(f, 1) -> f.(request)
+      f when is_function(f, 2) -> f.(request, options)
       _ -> raise "client not recognized"
     end
   end
