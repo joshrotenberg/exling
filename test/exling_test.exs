@@ -89,12 +89,16 @@ defmodule ExlingTest do
   end
 
   test "body" do
-
+    r = Exling.new() |> Exling.base("http://fake.com") |> Exling.body("stuff")
+    assert r.body != nil
+    IO.inspect r
   end
 
   test "query" do
 
   end
 
+  test "client" do
+  end
 
 end
