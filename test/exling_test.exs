@@ -2,6 +2,7 @@ defmodule ExlingTest do
   use ExUnit.Case
   doctest Exling
 
+  @fake_host "http://fake.com"
   test "new" do
     r = Exling.new()
     assert r.body == ""
@@ -11,7 +12,7 @@ defmodule ExlingTest do
     assert r.uri == %URI{authority: nil, fragment: nil, host: nil, path: nil, port: nil,
       query: nil, scheme: nil, userinfo: nil}
 
-    r = Exling.new("http://fake.com")
+    r = Exling.new(@fake_host)
     assert r.body == ""
     assert r.client == HTTPoison
     assert r.headers == []
@@ -21,7 +22,7 @@ defmodule ExlingTest do
   end
 
   test "base" do
-    r = Exling.new |> Exling.base("http://fake.com")
+    r = Exling.new |> Exling.base(@fake_host)
     assert r.body == ""
     assert r.client == HTTPoison
     assert r.headers == []
@@ -29,7 +30,7 @@ defmodule ExlingTest do
     assert r.uri == %URI{authority: "fake.com", fragment: nil, host: "fake.com", path: nil, 
       port: 80, query: nil, scheme: "http", userinfo: nil}
     
-    r = Exling.new |> Exling.base("http://fake.com/path?doof=cha")
+    r = Exling.new |> Exling.base(@fake_host <> "/path?doof=cha")
     assert r.body == ""
     assert r.client == HTTPoison
     assert r.headers == []
@@ -39,7 +40,7 @@ defmodule ExlingTest do
   end
 
   test "path" do
-    r = Exling.new |> Exling.base("http://fake.com") |> Exling.path("somepath")
+    r = Exling.new |> Exling.base(@fake_host) |> Exling.path("somepath")
     assert r.body == ""
     assert r.uri.path == "/somepath"
 
@@ -51,28 +52,43 @@ defmodule ExlingTest do
   end
 
   test "methods" do
-    r = Exling.new("http://fake.com") 
+    r = Exling.new(@fake_host) 
     assert r.method == :get
 
-    r = Exling.new("http://fake.com") |> Exling.post()
-    assert r.method == :post
-    
-    r = Exling.new("http://fake.com") |> Exling.get()
+    r = Exling.new(@fake_host) |> Exling.get()
     assert r.method == :get
 
-    r = Exling.new("http://fake.com") |> Exling.delete()
-    assert r.method == :delete
- 
-    r = Exling.new("http://fake.com") |> Exling.patch()
-    assert r.method == :patch
-
-    r = Exling.new("http://fake.com") |> Exling.options()
-    assert r.method == :options
-    
-    r = Exling.new("http://fake.com") |> Exling.get("stuff")
+    r = Exling.new(@fake_host) |> Exling.get("stuff")
     assert r.method == :get
     assert r.uri.path == "/stuff"
 
+    r = Exling.new(@fake_host) |> Exling.post()
+    assert r.method == :post
+
+    r = Exling.new(@fake_host) |> Exling.post("stuff")
+    assert r.method == :post
+    assert r.uri.path == "/stuff"
+
+    r = Exling.new(@fake_host) |> Exling.delete()
+    assert r.method == :delete
+    
+    r = Exling.new(@fake_host) |> Exling.delete("stuff")
+    assert r.method == :delete
+    assert r.uri.path == "/stuff"
+ 
+    r = Exling.new(@fake_host) |> Exling.patch()
+    assert r.method == :patch
+
+    r = Exling.new(@fake_host) |> Exling.patch("stuff")
+    assert r.method == :patch
+    assert r.uri.path == "/stuff"
+
+    r = Exling.new(@fake_host) |> Exling.options()
+    assert r.method == :options
+
+    r = Exling.new(@fake_host) |> Exling.options("stuff")
+    assert r.method == :options
+    assert r.uri.path == "/stuff"
   end
 
   test "headers" do

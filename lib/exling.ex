@@ -153,6 +153,7 @@ defmodule Exling do
   Sed the key/value pair to the HTTP headers. Additional calls for the same header type will replace any previous entry.
   """
   def set(request, k, v) do
+    # replace the pair if they already exist, otherwise add it
     headers = case List.keymember?(request.headers, k, 0) do
                 true -> List.keyreplace(request.headers, k, 0, {k,v})
                 _ -> request.headers ++ [{k, v}]
