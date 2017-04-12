@@ -99,15 +99,22 @@ defmodule ExlingTest do
 
     r = Exling.new("http://fake.com") |> Exling.add("Key", "Value") |>
       Exling.add("Key", "OtherValue")
-    assert r.headers == [{"Key", "OtherValue"}, {"Key", "Value"}]
-    IO.inspect r
+    assert r.headers == [{"Key", "Value"}, {"Key", "OtherValue"}]
+    r = Exling.add(r, "Stuff", "Here")
+    assert r.headers == [{"Key", "Value"}, {"Key", "OtherValue"}, {"Stuff", "Here"}]
 
+    r = Exling.new("http://fake.com") |> Exling.add("Key", "Value") |>
+      Exling.add(%{"Key" => "OtherValue", "Stuff" => "Here"})
+    assert r.headers == [{"Key", "Value"}, {"Key", "OtherValue"}, {"Stuff", "Here"}]
+
+    r = Exling.new("http://fake.com") |> Exling.add("Key", "Value") |>
+      Exling.add([{"Key", "OtherValue"}, {"Stuff", "Here"}])
+    assert r.headers == [{"Key", "Value"}, {"Key", "OtherValue"}, {"Stuff", "Here"}]
   end
 
   test "body" do
     r = Exling.new() |> Exling.base("http://fake.com") |> Exling.body("stuff")
     assert r.body != nil
-    IO.inspect r
   end
 
   test "query" do

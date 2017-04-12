@@ -145,9 +145,9 @@ defmodule Exling do
   @doc """
   Add the key/value pair to the HTTP headers. Additional calls for the same header type are appended.
   """
-  def add(request, k, v) do
-    update_in(request.headers, &List.insert_at(&1, 0, {k,v}))
-  end
+  def add(request, headers) when is_map(headers), do: update_in(request.headers, &(&1 ++ Map.to_list(headers)))
+  def add(request, headers) when is_list(headers), do: update_in(request.headers, &(&1 ++ headers))
+  def add(request, k, v), do: update_in(request.headers, &(&1 ++ [{k,v}]))
 
   @doc """
   Sed the key/value pair to the HTTP headers. Additional calls for the same header type will replace any previous entry.
