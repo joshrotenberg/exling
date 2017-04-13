@@ -152,8 +152,8 @@ defmodule Exling do
   @doc """
   Sed the key/value pair to the HTTP headers. Additional calls for the same header type will replace any previous entry.
   """
-  def set(request, headers) when is_list(headers) do
-    Enum.reduce(headers, request, fn(x, acc) -> set(acc, x) end)
+  def set(request, headers) when is_list(headers) or is_map(headers) do
+    Enum.reduce(headers, request, fn({k,v}, acc) -> set(acc, k,v) end)
   end
   def set(request, k, v) do
     # replace the pair if they already exist, otherwise add it

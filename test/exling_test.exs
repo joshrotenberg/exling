@@ -117,7 +117,11 @@ defmodule ExlingTest do
     r = Exling.new("http://fake.com") |> Exling.set("K", "V") |> Exling.set("K", "D")
     assert r.headers == [{"K", "D"}]
 
-    IO.inspect Exling.new("http://fake.com") |> Exling.set([{"k", "v"}, {"r", "i"}])
+    r = Exling.new("http://fake.com") |> Exling.set("K", "d") |> Exling.set([{"k", "v"}, {"r", "i"}])
+    assert r.headers == [{"K", "d"}, {"k", "v"}, {"r", "i"}]
+    
+    r = Exling.new("http://fake.com") |> Exling.set("K", "d") |> Exling.set(%{"k" => "v", "r" => "i"})
+    assert r.headers == [{"K", "d"}, {"k", "v"}, {"r", "i"}]
   end
 
   test "body" do
