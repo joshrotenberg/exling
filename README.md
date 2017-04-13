@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/joshrotenberg/exling.svg?branch=master)](https://travis-ci.org/joshrotenberg/exling) [![Hex pm](http://img.shields.io/hexpm/v/exling.svg?style=flat)](https://hex.pm/packages/exling) [![hex.pm downloads](https://img.shields.io/hexpm/dt/exling.svg?style=flat)](https://hex.pm/packages/exling) [![Coverage Status](https://coveralls.io/repos/github/joshrotenberg/exling/badge.svg?branch=master)](https://coveralls.io/github/joshrotenberg/exling?branch=master)
 
-![build status](https://gitlab.com/gitlab-org/gitlab-ce/badges/master/build.svg)
+![build status](https://gitlab.com/joshrotenberg/exling/badges/master/build.svg)
 ![coverage](https://gitlab.com/joshrotenberg/exling/badges/master/coverage.svg?job=coverage)
 
 > you don’t have to be a Jedi to fly an Exling
