@@ -3,7 +3,7 @@ defmodule Exling.Mixfile do
 
   def project do
     [app: :exling,
-     version: "0.1.1",
+     version: "0.1.2",
      name: "Exling",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
@@ -12,7 +12,7 @@ defmodule Exling.Mixfile do
      deps: deps(),
      package: package(),
      description: description(),
-     source_url: "https://github.com/joshrotenberg/exling"]
+     source_url: "https://gitlab.com/joshrotenberg/exling"]
   end
 
   defp description do
@@ -30,7 +30,7 @@ defmodule Exling.Mixfile do
     files: ["lib", "mix.exs", "README*", "LICENSE"],
     maintainers: ["Josh Rotenberg"],
     licenses: ["Apache 2.0"],
-    links: %{"GitHub" => "https://github.com/joshrotenberg/exling"}]
+    links: %{"GitHub" => "https://gitlab.com/joshrotenberg/exling"}]
   end
 
   defp deps do
