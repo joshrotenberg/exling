@@ -92,48 +92,79 @@ defmodule ExlingTest do
   end
 
   test "headers" do
-    r = Exling.new("http://fake.com") |> Exling.set("Key", "Value")
+    r = Exling.new(@fake_host) |> Exling.set("Key", "Value")
     assert r.headers == [{"Key", "Value"}]
     r = Exling.set(r, "Key", "OtherValue")
     assert r.headers == [{"Key", "OtherValue"}]
 
-    r = Exling.new("http://fake.com") |> Exling.add("Key", "Value") |>
+    r = Exling.new(@fake_host) |> Exling.add("Key", "Value") |>
       Exling.add("Key", "OtherValue")
     assert r.headers == [{"Key", "Value"}, {"Key", "OtherValue"}]
     r = Exling.add(r, "Stuff", "Here")
     assert r.headers == [{"Key", "Value"}, {"Key", "OtherValue"}, {"Stuff", "Here"}]
 
-    r = Exling.new("http://fake.com") |> Exling.add("Key", "Value") |>
+    r = Exling.new(@fake_host) |> Exling.add("Key", "Value") |>
       Exling.add(%{"Key" => "OtherValue", "Stuff" => "Here"})
     assert r.headers == [{"Key", "Value"}, {"Key", "OtherValue"}, {"Stuff", "Here"}]
 
-    r = Exling.new("http://fake.com") |> Exling.add("Key", "Value") |>
+    r = Exling.new(@fake_host) |> Exling.add("Key", "Value") |>
       Exling.add([{"Key", "OtherValue"}, {"Stuff", "Here"}])
     assert r.headers == [{"Key", "Value"}, {"Key", "OtherValue"}, {"Stuff", "Here"}]
 
-    r = Exling.new("http://fake.com") |> Exling.set("K", "V") 
+    r = Exling.new(@fake_host) |> Exling.set("K", "V") 
     assert r.headers == [{"K", "V"}]
 
-    r = Exling.new("http://fake.com") |> Exling.set("K", "V") |> Exling.set("K", "D")
+    r = Exling.new(@fake_host) |> Exling.set("K", "V") |> Exling.set("K", "D")
     assert r.headers == [{"K", "D"}]
 
-    r = Exling.new("http://fake.com") |> Exling.set("K", "d") |> Exling.set([{"k", "v"}, {"r", "i"}])
+    r = Exling.new(@fake_host) |> Exling.set("K", "d") |> Exling.set([{"k", "v"}, {"r", "i"}])
     assert r.headers == [{"K", "d"}, {"k", "v"}, {"r", "i"}]
     
-    r = Exling.new("http://fake.com") |> Exling.set("K", "d") |> Exling.set(%{"k" => "v", "r" => "i"})
+    r = Exling.new(@fake_host) |> Exling.set("K", "d") |> Exling.set(%{"k" => "v", "r" => "i"})
     assert r.headers == [{"K", "d"}, {"k", "v"}, {"r", "i"}]
   end
 
   test "body" do
-    r = Exling.new() |> Exling.base("http://fake.com") |> Exling.body("stuff")
-    assert r.body != nil
+    r = Exling.new() |> Exling.base(@fake_host) |> Exling.body("stuff")
+    assert r.body == "stuff"
+    IO.inspect r
+    
+    r = Exling.new() |> Exling.base(@fake_host) |> Exling.body(%{some: "stuff"}, :json)
+    assert r.body == "{\"some\":\"stuff\"}"
+
+    r = Exling.new() |> Exling.base(@fake_host) |> Exling.body(%{some: "stuff"}, :form)
+    assert r.body == {:form, %{some: "stuff"}}
+    assert r.headers == [{"Content-type", "application/x-www-form-urlencoded"}]
+    IO.inspect r
   end
 
   test "query" do
+    r = Exling.new(@fake_host) |> Exling.query("Key", "Value")
+    assert r.uri.query == "Key=Value"
 
+    r = Exling.new(@fake_host) |> Exling.query(%{"Key" => "Value"})
+    assert r.uri.query == "Key=Value"
+
+    r = Exling.new(@fake_host) |> Exling.query([{"Key", "Value"}])
+    assert r.uri.query == "Key=Value"
   end
 
   test "client" do
+    r = Exling.new(@fake_host) |> Exling.client(HTTPoison)
+    assert r.client == HTTPoison
+
+    r = Exling.new(@fake_host) |> Exling.client(HTTPotion)
+    assert r.client == HTTPotion
+    
+    r = Exling.new(@fake_host) |> Exling.client(:hackney)
+    assert r.client == :hackney
+    
+    r = Exling.new(@fake_host) |> Exling.client(:ibrowse)
+    assert r.client == :ibrowse
+
+    assert_raise RuntimeError, fn -> 
+      Exling.new(@fake_host) |> Exling.client(:notreal)
+    end
   end
 
 end
