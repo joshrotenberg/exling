@@ -124,18 +124,52 @@ defmodule ExlingTest do
     assert r.headers == [{"K", "d"}, {"k", "v"}, {"r", "i"}]
   end
 
+  test "accept" do
+    r = Exling.new(@fake_host) |> Exling.accept(:json)
+    assert r.headers == [{"Accept", "application/json"}]
+    
+    r = Exling.new(@fake_host) |> Exling.accept(:form)
+    assert r.headers == [{"Accept", "application/x-www-form-urlencoded"}]
+
+    r = Exling.new(@fake_host) |> Exling.accept(:xml)
+    assert r.headers == [{"Accept", "application/xml"}]
+    
+    r = Exling.new(@fake_host) |> Exling.accept(:plain)
+    assert r.headers == [{"Accept", "text/plain"}]
+  
+    r = Exling.new(@fake_host) |> Exling.accept("application/something-else-json")
+    assert r.headers == [{"Accept", "application/something-else-json"}]
+  end
+
+  test "content type" do
+    r = Exling.new(@fake_host) |> Exling.content_type(:json)
+    assert r.headers == [{"Content-type", "application/json"}]
+    
+    r = Exling.new(@fake_host) |> Exling.content_type(:form)
+    assert r.headers == [{"Content-type", "application/x-www-form-urlencoded"}]
+    
+    r = Exling.new(@fake_host) |> Exling.content_type(:xml)
+    assert r.headers == [{"Content-type", "application/xml"}]
+    
+    r = Exling.new(@fake_host) |> Exling.content_type("application/other-stuff-json")
+    assert r.headers == [{"Content-type", "application/other-stuff-json"}]
+  
+  end
+  
   test "body" do
     r = Exling.new() |> Exling.base(@fake_host) |> Exling.body("stuff")
     assert r.body == "stuff"
-    IO.inspect r
     
     r = Exling.new() |> Exling.base(@fake_host) |> Exling.body(%{some: "stuff"}, :json)
+    assert r.headers == [{"Content-type", "application/json"}]
     assert r.body == "{\"some\":\"stuff\"}"
 
     r = Exling.new() |> Exling.base(@fake_host) |> Exling.body(%{some: "stuff"}, :form)
     assert r.body == {:form, %{some: "stuff"}}
     assert r.headers == [{"Content-type", "application/x-www-form-urlencoded"}]
-    IO.inspect r
+    
+    r = Exling.new() |> Exling.base(@fake_host) |> Exling.body("<xml!>", :xml)
+    assert r.headers == [{"Content-type", "application/xml"}]
   end
 
   test "query" do

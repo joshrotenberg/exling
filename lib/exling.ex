@@ -22,6 +22,7 @@ defmodule Exling do
   """
 
   @supported_client_modules [HTTPoison, HTTPotion, :hackney, :ibrowse]
+  @default_client_module HTTPoison
 
   @doc """
   Returns a new `Exling.Request`. 
@@ -29,7 +30,13 @@ defmodule Exling do
       # a new, empty request
       r = Exling.new 
   """
-  def new(), do: %{%Exling.Request{} | uri: URI.parse("")}
+  def new() do
+    client = case Application.get_env(:exling, :client) do
+      nil -> @default_client_module
+      configured_client -> configured_client
+    end
+    %{%Exling.Request{} | uri: URI.parse(""), client: client}
+  end
   
   @doc """
   Returns a new Exling.Request with base URI configured.
@@ -37,7 +44,9 @@ defmodule Exling do
       # a request with our base URI already configured
       r = Exling.new("http://some.api.io/stuff")
   """
-  def new(base_uri), do: %Exling.Request{} |> base(base_uri)
+  def new(base_uri) do
+    new() |> base(base_uri)
+  end
 
   @doc """
   Set the client module for a predefined request handling backend. Supported options are 
@@ -261,6 +270,8 @@ defmodule Exling do
     case request.client do
       HTTPoison -> HTTPoison.request(request.method, URI.to_string(request.uri), request.body, request.headers, options)
       :hackney -> :hackney.request(request.method, URI.to_string(request.uri), request.headers, request.body, options)
+      # HTTPotion -> todo
+      # :ibrowse -> todo
       f when is_function(f, 1) -> f.(request)
       f when is_function(f, 2) -> f.(request, options)
       _ -> raise "client not recognized"
