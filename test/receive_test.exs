@@ -10,7 +10,6 @@ defmodule ReceiveTest do
     Bypass.expect bypass, fn conn ->
       assert "/foo" == conn.request_path
       assert "GET" == conn.method
-      IO.inspect conn
       Plug.Conn.resp(conn, 200, ~s<"some content">)
     end
     {:ok, %HTTPoison.Response{body: _body, headers: _headers, status_code: 200}} = Exling.new(endpoint_url(bypass.port))
@@ -24,11 +23,10 @@ defmodule ReceiveTest do
       assert "GET" == conn.method
       Plug.Conn.resp(conn, 200, ~s<"some content">)
     end
-    response = Exling.new(endpoint_url(bypass.port))
+    {:ok, 200, _response, _ref} = Exling.new(endpoint_url(bypass.port))
                 |> Exling.client(:hackney)
  		|> Exling.get("foo")
 		|> Exling.receive()
-  IO.inspect response
   end
   
   test "HTTPotion", %{bypass: bypass} do
@@ -37,11 +35,10 @@ defmodule ReceiveTest do
       assert "GET" == conn.method
       Plug.Conn.resp(conn, 200, ~s<"some content">)
     end
-    response = Exling.new(endpoint_url(bypass.port))
+    %HTTPotion.Response{body: _body, headers: _headers, status_code: 200}  = Exling.new(endpoint_url(bypass.port))
                 |> Exling.client(HTTPotion)
  		|> Exling.get("foo")
 		|> Exling.receive()
-  IO.inspect response
   end
 
   test ":ibrowse", %{bypass: bypass} do
@@ -50,12 +47,11 @@ defmodule ReceiveTest do
       assert "GET" == conn.method
       Plug.Conn.resp(conn, 200, ~s<"some content">)
     end
-    response = Exling.new(endpoint_url(bypass.port))
+    {:ok, '200', _headers, _body} = Exling.new(endpoint_url(bypass.port))
                 |> Exling.client(:ibrowse)
  		|> Exling.get("foo")
 		|> Exling.receive()
 
-  IO.inspect response
   end
 
   defp endpoint_url(port), do: "http://localhost:#{port}/"
