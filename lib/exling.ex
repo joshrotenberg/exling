@@ -257,6 +257,15 @@ defmodule Exling do
     %{request | uri: uri}
   end
   
+  defmacro is_loaded_module(module) do
+    quote do
+      case Code.ensure_loaded(unquote(module)) do
+        {:module, module_name} -> true
+        _ -> false
+      end
+    end
+  end
+  
   @doc """
   Send the request. The return value is whatever your chosen client implementation returns.
   See `client` for supported implementations.
@@ -268,12 +277,12 @@ defmodule Exling do
   """
   def receive(request, options \\ []) do
     case request.client do
+      f when is_function(f, 1) -> f.(request)
+      f when is_function(f, 2) -> f.(request, options)
       HTTPoison -> HTTPoison.request(request.method, URI.to_string(request.uri), request.body, request.headers, options)
       :hackney -> :hackney.request(request.method, URI.to_string(request.uri), request.headers, request.body, options)
       HTTPotion -> HTTPotion.request(request.method, URI.to_string(request.uri), [body: request.body, headers: request.headers] ++ options)
       :ibrowse -> :ibrowse.send_req(URI.to_string(request.uri) |> to_char_list, request.headers, request.method, request.body, options)
-      f when is_function(f, 1) -> f.(request)
-      f when is_function(f, 2) -> f.(request, options)
       _ -> raise "client not recognized"
     end
   end
