@@ -279,10 +279,10 @@ defmodule Exling do
     case request.client do
       f when is_function(f, 1) -> f.(request)
       f when is_function(f, 2) -> f.(request, options)
-      HTTPoison -> HTTPoison.request(request.method, URI.to_string(request.uri), request.body, request.headers, options)
-      :hackney -> :hackney.request(request.method, URI.to_string(request.uri), request.headers, request.body, options)
-      HTTPotion -> HTTPotion.request(request.method, URI.to_string(request.uri), [body: request.body, headers: request.headers] ++ options)
-      :ibrowse -> :ibrowse.send_req(URI.to_string(request.uri) |> to_char_list, request.headers, request.method, request.body, options)
+      HTTPoison -> Exling.Client.HTTPoison.receive(request, options)
+      :hackney -> Exling.Client.Hackney.receive(request, options)
+      HTTPotion -> Exling.Client.HTTPotion.receive(request, options)
+      :ibrowse -> Exling.Client.Ibrowse.receive(request, options)
       _ -> raise "client not recognized"
     end
   end
