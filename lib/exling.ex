@@ -53,7 +53,12 @@ defmodule Exling do
   `HTTPoison` (default), `HTTPotion`, `:hackney`, or `:ibrowse`. Or, set the client to a one or two
   arity function for custom impementations. A single arity function will just get the request, a double
   will also get the options passed to `receive`. The function will be called with the `Exling.Request` 
-  struct along with any options (see `receive`).
+  struct along with any options (see `receive`). In addition, you can set the default client in 
+  the config with `config :exling, client: <your client>` and avoid this call altogether.
+
+  Client implementations are simply modules that use the `Exling.Client` behaviour, that is, they
+  implement a `receive` function that simple accepts the `request` and `options`, so if none of 
+  these defaults work for you you can also implement your own.
   """
   def client(request, f) when is_function(f, 1) or is_function(f, 2), do: %{request | client: f}
   def client(request, client_module) do 
