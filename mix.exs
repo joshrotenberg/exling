@@ -35,10 +35,10 @@ defmodule Exling.Mixfile do
 
   defp deps do
     [{:poison, "~> 3.1"},
-     {:httpoison, "~> 0.11.1", only: [:dev, :test]},
-     {:ibrowse, "~> 4.4", only: [:dev, :test]},
-     {:httpotion, "~> 3.0", only: [:dev, :test]},
-     {:hackney, "~> 1.7", only: [:dev, :test]},
+     {:httpoison, "~> 0.11.2", only: [:dev, :test], optional: true},
+     {:ibrowse, "~> 4.4", only: [:dev, :test], optional: true},
+     {:httpotion, "~> 3.0", only: [:dev, :test], optional: true},
+     {:hackney, "~> 1.7", only: [:dev, :test], optional: true},
      {:ex_doc, "~> 0.14", only: :dev, runtime: false},
      {:bypass, "~> 0.6.0", only: :test},
      {:excoveralls, "~> 0.6", only: :test},
