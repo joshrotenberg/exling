@@ -11,6 +11,8 @@ if Code.ensure_loaded?(HTTPoison) do
       HTTPoison.request(request.method, URI.to_string(request.uri), request.body, request.headers, options)
     end
   end
+else 
+  IO.puts "not loaded!"  
 end
 
 if Code.ensure_loaded?(:hackney) do

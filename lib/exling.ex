@@ -281,12 +281,11 @@ defmodule Exling do
             Exling.receive()
   """
   def receive(request, options \\ []) do
-    IO.inspect request
     case request.client do
       f when is_function(f, 1) -> f.(request)
       f when is_function(f, 2) -> f.(request, options)
       _ -> with {:module, module_impl} <- Code.ensure_loaded(Module.concat(Exling.Client, request.client)),
-            do: apply(module_impl, String.to_atom("receive"), [request, options]) 
+             do: apply(module_impl, String.to_atom("receive"), [request, options]) 
     end
     #IO.inspect request
     #request.client(request, options)
