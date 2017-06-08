@@ -53,7 +53,12 @@ defmodule Exling do
   `HTTPoison` (default), `HTTPotion`, `:hackney`, or `:ibrowse`. Or, set the client to a one or two
   arity function for custom impementations. A single arity function will just get the request, a double
   will also get the options passed to `receive`. The function will be called with the `Exling.Request` 
-  struct along with any options (see `receive`).
+  struct along with any options (see `receive`). In addition, you can set the default client in 
+  the config with `config :exling, client: <your client>` and avoid this call altogether.
+
+  Client implementations are simply modules that use the `Exling.Client` behaviour, that is, they
+  implement a `receive` function that simple accepts the `request` and `options`, so if none of 
+  these defaults work for you you can also implement your own.
   """
   def client(request, f) when is_function(f, 1) or is_function(f, 2), do: %{request | client: f}
   def client(request, client_module) do 
@@ -276,15 +281,21 @@ defmodule Exling do
             Exling.receive()
   """
   def receive(request, options \\ []) do
+    IO.inspect request
     case request.client do
       f when is_function(f, 1) -> f.(request)
       f when is_function(f, 2) -> f.(request, options)
-      HTTPoison -> HTTPoison.request(request.method, URI.to_string(request.uri), request.body, request.headers, options)
-      :hackney -> :hackney.request(request.method, URI.to_string(request.uri), request.headers, request.body, options)
-      HTTPotion -> HTTPotion.request(request.method, URI.to_string(request.uri), [body: request.body, headers: request.headers] ++ options)
-      :ibrowse -> :ibrowse.send_req(URI.to_string(request.uri) |> to_char_list, request.headers, request.method, request.body, options)
-      _ -> raise "client not recognized"
+      _ -> with {:module, module_impl} <- Code.ensure_loaded(Module.concat(Exling.Client, request.client)),
+            do: apply(module_impl, String.to_atom("receive"), [request, options]) 
     end
+    #IO.inspect request
+    #request.client(request, options)
+    #  HTTPoison -> Exling.Client.HTTPoison.receive(request, options)
+    #  :hackney -> Exling.Client.Hackney.receive(request, options)
+    #  HTTPotion -> Exling.Client.HTTPotion.receive(request, options)
+    #  :ibrowse -> Exling.Client.Ibrowse.receive(request, options)
+    #  _ -> raise "client not recognized"
+    #end
   end
 
 end
